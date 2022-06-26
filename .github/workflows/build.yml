@@ -29,7 +29,7 @@ jobs:
         run: ./gradlew bootJar --info
   continuous-deployment:
     runs-on: ubuntu-latest
-    needs: [ continuous-integration ]
+    needs: [ build ]
     if: github.ref == 'refs/heads/main'
     steps:
       # Step 1
