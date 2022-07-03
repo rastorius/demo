@@ -33,7 +33,6 @@ jobs:
           ls /home/runner/work/demo/demo
           docker build -t xp-farm .
           docker tag xp-farm:latest 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
-          docker push 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -54,4 +53,6 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           ls /home/runner/work/demo/demo
+          docker push 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
+
           
