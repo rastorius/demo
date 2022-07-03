@@ -30,6 +30,7 @@ jobs:
           pwd
           ls /home/runner/work/demo/demo
           ./gradlew bootJar --info
+          ls /home/runner/work/demo/demo
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
