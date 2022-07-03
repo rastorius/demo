@@ -7,7 +7,7 @@ on:
     types: [ opened, synchronize, reopened ]
 jobs:
   build:
-    name: Build
+    name: continuous-integration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,24 +27,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: ./gradlew bootJar --info
-  continuous-deployment:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-    needs: [ build ]
-    if: github.ref == 'refs/heads/main'
+
     steps:
-      # Step 1
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      # Step 2
-      - name: Create CodeDeploy Deployment
-        id: deploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         run: |
-          aws deploy create-deployment \
-            --application-name Demo \
-            --deployment-group-name Demo-Group \
-            --deployment-config-name CodeDeployDefault.OneAtATime \
-            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t xp-farm .
+          docker tag xp-farm:latest 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
+          docker push 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
