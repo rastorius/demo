@@ -28,6 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: |
           pwd
+          ls /home/runner/work/demo/demo/build/libs
           ./gradlew bootJar --info
   deploy:
     name: Deploy
@@ -53,6 +54,7 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
+          ls /home/runner/work/demo/demo/build/libs
           docker build -t xp-farm .
           docker tag xp-farm:latest 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
           docker push 717641744530.dkr.ecr.us-east-1.amazonaws.com/xp-farm:latest
